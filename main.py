@@ -1,8 +1,10 @@
 import pygame
 import random
+import os
 
 pygame.font.init()
 pygame.mixer.init()
+
 # **CONSTANTS**
 FPS = 10
 TOP_PADDING = 70
@@ -28,6 +30,9 @@ WIN_WIDTH, WIN_HEIGHT = 595, 525 + TOP_PADDING
 WIN = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
 pygame.display.set_caption("Snake Game")
 
+# Sounds
+POINT_SOUND = pygame.mixer.Sound(os.path.join("Assets", "point.mp3"))
+GAMEOVER_SOUND = pygame.mixer.Sound(os.path.join("Assets", "game_over.wav"))
 
 def draw_game(snake, apple, score):
 
@@ -103,6 +108,7 @@ def is_apple_eaten(snake, apple):
     snake_head = snake[len(snake) - 1]
 
     if snake_head.x == apple.x and snake_head.y == apple.y:
+        POINT_SOUND.play()
         pygame.event.post(pygame.event.Event(APPLE_EATEN))
 
 
@@ -142,8 +148,8 @@ def main():
                     direction = "left"
             
             if event.type == APPLE_EATEN:
-                random_x = random.randint(0,16) + 1
-                random_y = random.randint(0,14) + 1
+                random_x = random.randint(0,16) 
+                random_y = random.randint(0,14)
                 apple = pygame.Rect(random_x * 35, random_y * 35 + TOP_PADDING, 35, 35)
 
                 score += 1
@@ -153,6 +159,7 @@ def main():
                 snake.insert(0, pygame.Rect(-35, -35, 35, 35))
 
             if event.type == GAMEOVER:
+                GAMEOVER_SOUND.play()
                 gameover()
                 main()
 
