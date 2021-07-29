@@ -30,6 +30,10 @@ WIN_WIDTH, WIN_HEIGHT = 595, 525 + TOP_PADDING
 WIN = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
 pygame.display.set_caption("Snake Game")
 
+
+with open("highscore.txt", mode="r") as highscore:
+    highscore_num = highscore.read()
+
 # Sounds
 POINT_SOUND = pygame.mixer.Sound(os.path.join("Assets", "point.mp3"))
 GAMEOVER_SOUND = pygame.mixer.Sound(os.path.join("Assets", "game_over.wav"))
@@ -52,7 +56,12 @@ def draw_game(snake, apple, score):
 
     # Score
     score_text = SCORE_FONT.render(f"Score: {str(score)}", 1, WHITE)
-    WIN.blit(score_text, (WIN_WIDTH/2 - score_text.get_width()/2, TOP_PADDING/2 - score_text.get_height()/2))
+    WIN.blit(score_text, (WIN_WIDTH/3 - score_text.get_width(), TOP_PADDING/2 - score_text.get_height()/2))
+
+    # Highscore
+    with open("highscore.txt", mode="r") as highscore:
+        highscore_text = SCORE_FONT.render(f"High Score: {highscore.read()}", 1, WHITE)
+        WIN.blit(highscore_text, (WIN_WIDTH - highscore_text.get_width() * 1.3, TOP_PADDING/2 - highscore_text.get_height()/2))
 
     # Draw an Apple
     pygame.draw.rect(WIN, RED, apple)
@@ -97,9 +106,12 @@ def is_gameover(snake):
         pygame.event.post(pygame.event.Event(GAMEOVER))
 
     
-def gameover():
+def gameover(score):
     gameover_text = GAMEOVER_FONT.render("GAMEOVER", 1, WHITE)
     WIN.blit(gameover_text, (WIN_WIDTH/2 - gameover_text.get_width()/2, WIN_HEIGHT/2 - gameover_text.get_height()/2))
+    if score > int(highscore_num):
+        with open("highscore.txt", mode="w") as highscore:
+            highscore.write(str(score))
     pygame.display.update()
     pygame.time.delay(2000)
 
@@ -160,7 +172,7 @@ def main():
 
             if event.type == GAMEOVER:
                 GAMEOVER_SOUND.play()
-                gameover()
+                gameover(score)
                 main()
 
         is_apple_eaten(snake, apple)
